@@ -2,7 +2,8 @@
 from typing import Callable, Iterable, Optional, Union, List, Any
 import xmlrpc.client
 
-from certbot import errors
+import zope
+from certbot import errors, interfaces
 from certbot.plugins import common
 from certbot.compat import os
 
@@ -11,6 +12,8 @@ from certbot_access_server._internal.asxmlrpcapi import UnixStreamTransport
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
 
+@zope.interface.implementer(interfaces.IInstaller)
+@zope.interface.provider(interfaces.IPluginFactory)
 class Installer(common.Installer):
     """Installer plugin for OpenVPN Access Server.
 

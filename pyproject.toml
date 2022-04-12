@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "certbot-access-server"
-version = "1.0.1"
+version = "0.1.0"
 authors = [
     { name="OpenVPN Inc.", email="info@openvpn.net" },
 ]
 dependencies = [
-    'certbot>=1.20.0',
-    'acme>=1.20.0'
+    'certbot',
+    'acme'
 ]
 description = "OpenVPN Access Server Installer plugin for Certbot"
 readme = "README.rst"

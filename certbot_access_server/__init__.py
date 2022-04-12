@@ -8,11 +8,10 @@ Named Arguments
 ---------------
 
 ==========================================  ===================================
-``--as-installer-socket``                   Path to the socket OpenVPN Access Server
+``--certbot-access-server:as-installer-socket``                   Path to socket OpenVPN Access Server
                                             is listening at
-                                            (Default:
-                                            /usr/local/openvpn_as/etc/sock/sagent.localroot)
-``--as-installer-path-only``                Set path to certificate to
+                                            (Default: /usr/local/openvpn_as/etc/sock/sagent.localroot)
+``--certbot-access-server:as-installer-path-only``                Set path to certificate to
                                             OpenVPN Access Server instead of
                                             certificate itself
                                             (Default: false)

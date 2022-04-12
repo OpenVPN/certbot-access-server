@@ -1,14 +1,11 @@
-import os
-import sys
-
 from setuptools import setup, find_packages
 
-version = '1.0.1'
+version = '0.1.0'
 
 install_requires = [
-    'setuptools>=39.0.0',
-    'certbot>=1.20.0',
-    'acme>=1.20.0'
+    'setuptools',
+    'certbot',
+    'acme'
 ]
 
 docs_extras = [
@@ -24,7 +21,7 @@ setup(
     author="Certbot Project",
     author_email='certbot-dev@eff.org',
     license='Apache License 2.0',
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Plugins',
@@ -33,6 +30,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
