@@ -5,7 +5,7 @@ from certbot import errors
 from certbot.plugins import common
 from certbot.compat import os
 
-from .asxmlrpcapi import UnixStreamXMLRPCClient
+from certbot_access_server._internal.asxmlrpcapi import UnixStreamXMLRPCClient
 
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
@@ -13,8 +13,8 @@ DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 class Installer(common.Installer):
     """Installer plugin for OpenVPN Access Server.
 
-    This plugin performs installing certificates into Access Server through
-    xmlrpc protocol
+    This plugin installs certificates into Access Server through
+    XML-RPC protocol.
     """
     description = "OpenVPN Access Server Installer plugin"
 
@@ -34,45 +34,60 @@ class Installer(common.Installer):
             'path-only',
             default=False,
             action='store_true',
-            help="Upload only cert paths instead of cert body"
+            help="Set only cert paths instead of cert contents."
         )
 
     def deploy_cert(self, domain: str, cert_path: str, key_path: str,
                     chain_path: str, fullchain_path: str) -> None:
         if self.conf('path_only'):
-            self.rpc_proxy.ConfigPut({'cs.priv_key': key_path})
-            self.rpc_proxy.ConfigPut({'cs.cert': cert_path})
-            self.rpc_proxy.ConfigPut({'cs.ca_bundle': chain_path})
+            cert_data = {
+                'cs.priv_key': key_path,
+                'cs.cert': cert_path,
+                'cs.ca_bundle': chain_path,
+            }
         else:
-            with open(key_path) as f:
-                self.rpc_proxy.ConfigPut({'cs.priv_key': f.read()})
-            with open(cert_path) as f:
-                self.rpc_proxy.ConfigPut({'cs.cert': f.read()})
-            with open(chain_path) as f:
-                self.rpc_proxy.ConfigPut({'cs.ca_bundle': f.read()})
+            with open(key_path) as priv_key_f, open(cert_path) as cert_f, open(
+                    chain_path) as chain_f:
+                priv_key = priv_key_f.read()
+                cert = cert_f.read()
+                ca_bundle = chain_f.read()
+            cert_data = {
+                'cs.priv_key': priv_key,
+                'cs.cert': cert,
+                'cs.ca_bundle': ca_bundle,
+            }
+        self.rpc_proxy.ConfigPut(cert_data)
 
     def config_test(self) -> None:
-        sock_name = self.conf('socket')
-        if not os.path.exists(sock_name):
-            raise errors.PluginError(
-                f"Access Server socket {sock_name} does not exist")
+        pass
 
     def enhance(self, domain: str, enhancement: str,
                 options: Optional[Union[List[str], str]] = None) -> None:
         pass
 
     def get_all_names(self) -> Iterable[str]:
-        raise errors.NotSupportedError(
-            'Access Server plugin does not support automatic domain detection')
+        profile_name = self.rpc_proxy.RunGetActiveProfileName()
+        config = self.rpc_proxy.ConfigQuery(profile_name, ['host.name'])
+        return [config['host.name']]
 
     def more_info(self) -> str:
-        return 'This plugin installs LetsEncrypt cetificate for HTTPS into ' \
-               'OpenVPN Access Server instance'
+        return 'This plugin installs LetsEncrypt certificate for HTTPS into ' \
+               'an OpenVPN Access Server instance'
 
     def prepare(self) -> None:
-        self.config_test()
+        sock_name = self.conf('socket')
+        if not os.path.exists(sock_name):
+            raise errors.MisconfigurationError(
+                f"OpenVPN Access Server socket {sock_name} does not exist")
         self.rpc_proxy = UnixStreamXMLRPCClient(
             self.conf('socket'))
+        try:
+            self.rpc_proxy.GetASVersion()
+        except ConnectionRefusedError:
+            raise errors.MisconfigurationError(
+                f"OpenVPN Access Server doesn't appear to be listening on"
+                f"socket {sock_name}"
+            )
 
     def restart(self) -> None:
         self.rpc_proxy.RunStart('warm')
