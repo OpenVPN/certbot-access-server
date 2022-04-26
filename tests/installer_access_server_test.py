@@ -1,6 +1,7 @@
 import tempfile
 import sys
 import socket
+import xmlrpc.client
 
 
 try:
@@ -98,13 +99,15 @@ def sock():
 def make_installer(sock, request, monkeypatch):
     with monkeypatch.context() as m:
         rpc_mock = mock.MagicMock()
-        m.setattr(installer_access_server, 'UnixStreamXMLRPCClient', rpc_mock)
+        transport_mock = mock.MagicMock()
+        m.setattr(xmlrpc.client, 'ServerProxy', rpc_mock)
+        m.setattr(installer_access_server, 'UnixStreamTransport', transport_mock)
         config_params = dict(access_server_socket=sock, **request.param)
         config = mock.MagicMock(**config_params)
         installer = Installer(config, 'access-server')
         installer.prepare()
         rpc_mock.assert_has_calls([
-            mock.call(sock),
+            mock.call('http://localhost', transport=transport_mock(sock)),
             mock.call().GetASVersion(),
         ])
         rpc_mock.reset_mock()
