@@ -21,16 +21,3 @@ class UnixStreamTransport(xmlrpc.client.Transport):
 
     def make_connection(self, _: Any) -> HTTPConnection:
         return UnixStreamHTTPConnection(self.socket_path)
-
-
-class UnixStreamXMLRPCClient(xmlrpc.client.ServerProxy):
-    """Hack to avoid 'unsupported XML-RPC protocol' error"""
-    def __init__(self, addr: str, **kwargs: Any) -> None:
-        transport = UnixStreamTransport(addr)
-        # For some reason xmlrpc.client.ServerProxy __init__ raises an Exception
-        # if scheme isn't 'http' or 'https'
-        # So we're adding explicit 'http://' as a uri despite that it isn't
-        # needed when connecting through a socket
-        super().__init__(
-            "http://", transport=transport, **kwargs
-        )

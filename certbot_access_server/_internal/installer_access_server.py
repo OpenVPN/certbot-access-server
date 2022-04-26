@@ -1,11 +1,13 @@
 """Installer plugin for OpenVPN Access Server"""
 from typing import Callable, Iterable, Optional, Union, List, Any
+import xmlrpc.client
 
 from certbot import errors
 from certbot.plugins import common
 from certbot.compat import os
 
-from certbot_access_server._internal.asxmlrpcapi import UnixStreamXMLRPCClient
+from certbot_access_server._internal.asxmlrpcapi import UnixStreamTransport
+
 
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
@@ -79,8 +81,9 @@ class Installer(common.Installer):
         if not os.path.exists(sock_name):
             raise errors.MisconfigurationError(
                 f"OpenVPN Access Server socket {sock_name} does not exist")
-        self.rpc_proxy = UnixStreamXMLRPCClient(
-            self.conf('socket'))
+        self.rpc_proxy = xmlrpc.client.ServerProxy(
+            'http://localhost',
+            transport=UnixStreamTransport(self.conf('socket')))
         try:
             self.rpc_proxy.GetASVersion()
         except ConnectionRefusedError:
