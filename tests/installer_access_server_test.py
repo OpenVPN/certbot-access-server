@@ -159,14 +159,19 @@ def test_restart(make_installer):
 
 def test_get_all_names(make_installer):
     rpc_mock, installer = make_installer
-    rpc_mock().RunGetActiveProfileName = mock.MagicMock(return_value='TestProfile')
+    rpc_mock().ConfigQuery = mock.MagicMock(
+        return_value={'host.name': 'test_host_name'})
+    expected_calls = [
+        mock.call().ConfigQuery(None, ['host.name']),
+    ]
+    result = installer.get_all_names()
+    assert result == ['test_host_name']
+    rpc_mock.assert_has_calls(expected_calls)
     rpc_mock.reset_mock()
-    installer.get_all_names()
-    rpc_mock.assert_has_calls([
-        mock.call().RunGetActiveProfileName(),
-        mock.call().ConfigQuery('TestProfile', ['host.name']),
-        mock.call().ConfigQuery().__getitem__('host.name'),
-    ])
+    rpc_mock().ConfigQuery = mock.MagicMock(return_value={})
+    result = installer.get_all_names()
+    assert result == ['']
+    rpc_mock.assert_has_calls(expected_calls)
 
 
 def test_incorrect_socket():
