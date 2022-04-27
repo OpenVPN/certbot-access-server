@@ -83,7 +83,8 @@ class Installer(common.Installer):
         sock_name = self.conf('socket')
         if not os.path.exists(sock_name):
             raise errors.MisconfigurationError(
-                f"OpenVPN Access Server socket {sock_name} does not exist")
+                f"OpenVPN Access Server socket {sock_name} does not exist. "
+                f"OpenVPN Access server not running?”")
         self.rpc_proxy = xmlrpc.client.ServerProxy(
             'http://localhost',
             transport=UnixStreamTransport(self.conf('socket')),
