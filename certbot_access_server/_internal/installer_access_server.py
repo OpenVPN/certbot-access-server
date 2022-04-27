@@ -8,7 +8,6 @@ from certbot.compat import os
 
 from certbot_access_server._internal.asxmlrpcapi import UnixStreamTransport
 
-
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
 
@@ -68,9 +67,13 @@ class Installer(common.Installer):
         pass
 
     def get_all_names(self) -> Iterable[str]:
-        profile_name = self.rpc_proxy.RunGetActiveProfileName()
-        config = self.rpc_proxy.ConfigQuery(profile_name, ['host.name'])
-        return [config['host.name']]
+        profile_name = None  # use default profile
+        try:
+            hostname = self.rpc_proxy.ConfigQuery(
+                profile_name, ['host.name'])['host.name']
+        except KeyError:
+            hostname = ''
+        return [hostname]
 
     def more_info(self) -> str:
         return 'This plugin installs LetsEncrypt certificate for HTTPS into ' \
@@ -83,7 +86,9 @@ class Installer(common.Installer):
                 f"OpenVPN Access Server socket {sock_name} does not exist")
         self.rpc_proxy = xmlrpc.client.ServerProxy(
             'http://localhost',
-            transport=UnixStreamTransport(self.conf('socket')))
+            transport=UnixStreamTransport(self.conf('socket')),
+            allow_none=True,
+        )
         try:
             self.rpc_proxy.GetASVersion()
         except ConnectionRefusedError:
