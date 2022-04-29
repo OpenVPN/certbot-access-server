@@ -72,6 +72,7 @@ class Installer(common.Installer):
             hostname = self.rpc_proxy.ConfigQuery(
                 profile_name, ['host.name'])['host.name']
         except KeyError:
+            # certbot will ignore empty string so this is more for consistency
             hostname = ''
         return [hostname]
 
@@ -85,6 +86,9 @@ class Installer(common.Installer):
             raise errors.MisconfigurationError(
                 f"OpenVPN Access Server socket {sock_name} does not exist. "
                 f"OpenVPN Access server not running?”")
+        # This is stub address actually because we override make_connection
+        # but ServerProxy will raise an exception at init against just empty
+        # string
         self.rpc_proxy = xmlrpc.client.ServerProxy(
             'http://localhost',
             transport=UnixStreamTransport(self.conf('socket')),
