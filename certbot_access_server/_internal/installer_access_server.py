@@ -68,12 +68,11 @@ class Installer(common.Installer):
 
     def get_all_names(self) -> Iterable[str]:
         profile_name = None  # use default profile
-        try:
-            hostname = self.rpc_proxy.ConfigQuery(
-                profile_name, ['host.name'])['host.name']
-        except KeyError:
-            # certbot will ignore empty string so this is more for consistency
-            hostname = ''
+        # certbot will ignore empty string so default value is more for the
+        # consistency
+        hostname = self.rpc_proxy.ConfigQuery(
+            profile_name, ['host.name']).get('host.name', '')
+
         return [hostname]
 
     def more_info(self) -> str:
