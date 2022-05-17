@@ -11,9 +11,9 @@ Named Arguments
 ``--as-installer-socket``                   Path to socket OpenVPN Access Server
                                             is listening at
                                             (Default: /usr/local/openvpn_as/etc/sock/sagent.localroot)
-``--as-installer-path-only``                Set only path to certificate to
+``--as-installer-path-only``                Set path to certificate to
                                             OpenVPN Access Server instead of
-                                            certificate body
+                                            certificate itself
                                             (Default: false)
 ==========================================  ===================================
 """
