@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "certbot-access-server"
+version = "1.0.0"
+authors = [
+    { name="OpenVPN Inc.", email="info@openvpn.net" },
+]
+dependencies = [
+    'certbot>=1.20.0',
+    'acme>=1.20.0'
+]
+description = "OpenVPN Access Server Installer plugin for Certbot"
+readme = "README.rst"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Plugins',
+    'Intended Audience :: System Administrators',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Topic :: Internet :: WWW/HTTP',
+    'Topic :: Security',
+    'Topic :: System :: Installation/Setup',
+    'Topic :: System :: Networking',
+    'Topic :: System :: Systems Administration',
+    'Topic :: Utilities',
+]
