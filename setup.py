@@ -20,7 +20,7 @@ setup(
     name='certbot-access-server',
     version=version,
     description="OpenVPN Access Server Installer plugin for Certbot",
-    url='https://github.com/certbot/certbot',
+    url='https://github.com/OpenVPN/certbot-access-server',
     author="Certbot Project",
     author_email='certbot-dev@eff.org',
     license='Apache License 2.0',
