@@ -2,7 +2,8 @@
 from typing import Callable, Iterable, Optional, Union, List, Any
 import xmlrpc.client
 
-from certbot import errors
+from certbot import errors, interfaces
+from certbot.interfaces import RenewableCert
 from certbot.plugins import common
 from certbot.compat import os
 
@@ -11,7 +12,7 @@ from certbot_access_server._internal.asxmlrpcapi import UnixStreamTransport
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
 
-class Installer(common.Installer):
+class Installer(common.Installer, interfaces.GenericUpdater):
     """Installer plugin for OpenVPN Access Server.
 
     This plugin installs certificates into Access Server through
@@ -110,3 +111,16 @@ class Installer(common.Installer):
 
     def supported_enhancements(self) -> List[str]:
         return []
+
+    def renew_deploy(self, lineage: RenewableCert, *args: Any,
+                     **kwargs: Any) -> None:
+        """
+        Redeploy certificates when calling `certbot renew`
+        """
+
+        self.deploy_cert(lineage.names()[0], lineage.cert_path,
+                         lineage.key_path, lineage.chain_path,
+                         lineage.fullchain_path)
+
+
+interfaces.RenewDeployer.register(Installer)
