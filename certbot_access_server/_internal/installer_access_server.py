@@ -12,7 +12,7 @@ from certbot_access_server._internal.asxmlrpcapi import UnixStreamTransport
 DEFAULT_SOCKET = "/usr/local/openvpn_as/etc/sock/sagent.localroot"
 
 
-class Installer(common.Installer, interfaces.GenericUpdater):
+class Installer(common.Installer, interfaces.RenewDeployer):
     """Installer plugin for OpenVPN Access Server.
 
     This plugin installs certificates into Access Server through
